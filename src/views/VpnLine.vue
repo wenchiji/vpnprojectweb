@@ -127,7 +127,7 @@
                 <el-form-item style="width: 80%" label="备注" prop="remark" >
                     <el-input v-model="editForm.remark" ></el-input>
                 </el-form-item>
-                <el-form-item style="width: 80%" label="线路情况" prop="isAllowPing" >
+                <el-form-item style="width: 80%" label="是否允许ping" prop="isAllowPing" >
                     <el-input v-model="editForm.isAllowPing" ></el-input>
                 </el-form-item>
             </el-form>

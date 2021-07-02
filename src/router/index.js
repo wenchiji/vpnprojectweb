@@ -70,7 +70,7 @@ const routes = [
     ]
   },
 ]
-
+// 创建路由对象
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
@@ -78,3 +78,28 @@ const router = new VueRouter({
 })
 
 export default router
+
+if (sessionStorage.getItem("token")){
+  this.$store.commit("set_token", sessionStorage.getItem("token"))
+}
+
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
+// 使用 router.beforeEach 注册一个全局前置守卫，判断用户是否登陆
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    next();
+  } else {
+    let token = sessionStorage.getItem('Authorization');
+    if (token === null || token === '') {
+      next('/login');
+    } else {
+      next();
+    }
+  }
+});
+
+

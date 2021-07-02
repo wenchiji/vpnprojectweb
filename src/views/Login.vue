@@ -14,11 +14,11 @@
                 </el-form-item>
                 <el-form-item style="margin-bottom: 10px">
                     <el-button style="width: 100%" type="primary"
-                               :loading="loading" @click="handleLogin()">登录</el-button>
+                               :loading="loading" @click="handleLogin">登录</el-button>
                 </el-form-item>
                 <el-form-item style="margin-bottom: 50px">
                     <el-button style="width: 100%" type="primary"
-                               :loading="loading" @click="register()">注册</el-button>
+                               :loading="loading" @click="register">注册</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
@@ -26,6 +26,9 @@
 </template>
 
 <script>
+    import {mapMutations} from "vuex";
+    import JSEncrypt from 'jsencrypt/bin/jsencrypt'
+
     export default {
         inject: ['reload'], //依赖注入
         name: "login",
@@ -40,8 +43,30 @@
             };
         },
         methods: {
+            ...mapMutations(['changeLogin']),
+            encrypt(publicKey, data) {
+                const encryptor = new JSEncrypt()
+                encryptor.setPublicKey(publicKey) // 设置公钥
+                return encryptor.encrypt(data) // 对需要加密的数据进行加密
+            },
+            getKey(){
+                this.$axios.post('http://127.0.0.1:8000/user/getKey/').then(response =>{
+                    if (response.data === null){
+                        this.$alert('请重新登录!','提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                                this.reload();
+                            }
+                        });
+                    }else{
+                        this.publicKey = response.data
+                        this.rsaUsername = this.encrypt(this.publicKey, this.loginForm.username)
+                        this.rsaPassword = this.encrypt(this.publicKey, this.loginForm.password)
+                        this.handleLogin()
+                    }
+                })
+            },
             handleLogin() {
-                // this.$axios.post('http://103.228.163.54:9009/user/login/',{
                 this.$axios.post('http://127.0.0.1:8000/user/login/',{
                     action:'login',
                     username: this.loginForm.username,
@@ -50,11 +75,10 @@
                     this.loading = false;
                     let code = response.data;
                     if(code.success === 'true'){
-                        localStorage.setItem('eleToken',code.token);
-                        console.log('eleToken');
+                        this.changeLogin({Authorization:code.token})
                         this.$router.push('/vpnUser');
                     }else {
-                        this.$alert('用户名或密码错误!','提示', {
+                        this.$alert(code.msg,'提示', {
                             confirmButtonText: '确定',
                             callback: action => {
                                 this.reload();
