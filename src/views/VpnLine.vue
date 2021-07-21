@@ -210,21 +210,12 @@
                     secretKey:this.editForm.secret_key,
                     remark:this.editForm.remark
                 }).then( response => {
-                    if(response.data.success == 'true'){
-                        this.$alert('添加成功!','提示', {
+                    this.$alert(response.data.msg,'提示', {
                             confirmButtonText: '确定',
                             callback:action=>{
-                                location.reload();
+                                this.reload();
                             }
                         });
-                    }else {
-                        this.$alert('添加失败!','提示', {
-                            confirmButtonText: '确定',
-                            callback:action=>{
-                                location.reload();
-                            }
-                        });
-                    }
                 })
             },
             updateVpnLine(){
@@ -241,21 +232,12 @@
                     remark:this.editForm.remark,
                     isAllowPing:this.editForm.isAllowPing
                 }).then( response => {
-                    if(response.data.success == 'true'){
-                        this.$alert('更新成功!','提示', {
-                            confirmButtonText: '确定',
-                            callback:action=>{
-                                location.reload();
-                            }
-                        });
-                    }else {
-                        this.$alert('更新失败!','提示', {
-                            confirmButtonText: '确定',
-                            callback:action=>{
-                                location.reload();
-                            }
-                        });
-                    }
+                    this.$alert(response.data.msg,'提示', {
+                        confirmButtonText: '确定',
+                        callback:action=>{
+                            this.reload();
+                        }
+                    });
                 })
             },
             deleteVpnLine(row){
@@ -268,21 +250,12 @@
                         action:'deleteVpnLine',
                         id:row.id
                     }).then((response)=>{
-                        if(response.data.success == "true"){
-                            this.$alert('删除成功!','提示', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    this.reload();
-                                }
-                            });
-                        }else {
-                            this.$alert('删除失败!','提示', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    this.reload();
-                                }
-                            });
-                        }
+                        this.$alert(response.data.msg,'提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                                this.reload();
+                            }
+                        });
                     })
                 }).catch((e) => {
                     console.log(e.message);
@@ -315,8 +288,7 @@
         data() {
             return {
                 select:'',
-                baseUrl: 'http://127.0.0.1:8000/vpnproject/vpnline/',
-                // baseUrl: 'http://14.18.205.249:9002/vpnlog/getvpnlog/',
+                baseUrl: this.$root.URL+'vpnproject/vpnline/',
                 input:'',
                 queryParam:{
                     action:'',

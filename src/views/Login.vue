@@ -44,30 +44,8 @@
         },
         methods: {
             ...mapMutations(['changeLogin']),
-            encrypt(publicKey, data) {
-                const encryptor = new JSEncrypt()
-                encryptor.setPublicKey(publicKey) // 设置公钥
-                return encryptor.encrypt(data) // 对需要加密的数据进行加密
-            },
-            getKey(){
-                this.$axios.post('http://127.0.0.1:8000/user/getKey/').then(response =>{
-                    if (response.data === null){
-                        this.$alert('请重新登录!','提示', {
-                            confirmButtonText: '确定',
-                            callback: action => {
-                                this.reload();
-                            }
-                        });
-                    }else{
-                        this.publicKey = response.data
-                        this.rsaUsername = this.encrypt(this.publicKey, this.loginForm.username)
-                        this.rsaPassword = this.encrypt(this.publicKey, this.loginForm.password)
-                        this.handleLogin()
-                    }
-                })
-            },
             handleLogin() {
-                this.$axios.post('http://127.0.0.1:8000/user/login/',{
+                this.$axios.post(this.$root.URL+'user/login/',{
                     action:'login',
                     username: this.loginForm.username,
                     password: this.loginForm.password

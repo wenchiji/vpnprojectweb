@@ -49,50 +49,41 @@
     export default {
         inject: ['reload'], //依赖注入
         methods: {
-            getList(that){
-                this.$axios.post(this.baseUrl,{
-                    action:'listManager',
-                    page:this.currentPage,
-                    pagesize:this.pageSize,
+            getList(that) {
+                this.$axios.post(this.baseUrl, {
+                    action: 'listManager',
+                    page: this.currentPage,
+                    pagesize: this.pageSize,
                 }).then(function (response) {
                     that.tableData = response.data.users
                     that.total = response.data.totalElements
                 })
             },
-            findByName(){
-                this.$axios.post(this.baseUrl,{
-                    action:'findManager',
-                    username:this.username
+            findByName() {
+                this.$axios.post(this.baseUrl, {
+                    action: 'findManager',
+                    username: this.username
                 }).then(response => {
                     this.tableData = response.data.manager
                     this.total = response.data.totalElements
                 })
             },
             //批量选择时触发
-            selectionChange(val){
+            selectionChange(val) {
                 this.selectionList = val
             },
-            addUser(){
-                this.$axios.post(this.baseUrl,{
-                    action:'addManager',
+            addUser() {
+                this.$axios.post(this.baseUrl, {
+                    action: 'addManager',
                     username: this.addForm.username,
-                    email:this.addForm.email
-                }).then((response)=>{
-                    if(response.data.success == 'true'){
-                        this.$alert('用户添加成功!','提示', {
-                            confirmButtonText: '确定',
-                            callback: action => {
-                                this.reload();
-                            }
-                        });
-                    }else {
-                        this.$alert('添加失败!','提示', {
-                            confirmButtonText: '确定',
-                            callback: action => {
-                                this.reload();
-                            }
-                        });
-                    }
+                    email: this.addForm.email
+                }).then((response) => {
+                    this.$alert(response.data.msg, '提示', {
+                        confirmButtonText: '确定',
+                        callback: action => {
+                            this.reload();
+                        }
+                    })
                 })
             },
             deleteUser(row) {
@@ -101,64 +92,58 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$axios.post(this.baseUrl,{
-                        action:'deleteManager',
-                        id:row.id
-                    })
-                    this.$alert('删除成功!','提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                            this.reload();
-                        }
+                    this.$axios.post(this.baseUrl, {
+                        action: 'deleteManager',
+                        id: row.id
+                    }).then((response) => {
+                        this.$alert(response.data.msg, '提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                                this.reload();
+                            }
+                        });
+                    }).catch((e) => {
+                        console.log(e.message);
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
                     });
-                }).catch((e) => {
-                    console.log(e.message);
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
-                });
+                })
             },
-            //显示编辑页面
-            handerEdit: function(index,row){
-                this.userFormVisible = true;
-                this.editForm = Object.assign({},row);
-            },
-            pageChange(currentPage){
+            pageChange(currentPage) {
                 const that = this
                 that.currentPage = currentPage;
                 that.getList(that);
             },
-
-        },
-        created() {
-            const this1 = this
-            this1.getList(this1)
-        },
-        data() {
-            return {
-                // baseUrl: 'http://103.228.163.54:9009/user/users/',
-                baseUrl: 'http://127.0.0.1:8000/user/users/',
-                input:'',
-                username:'',
-                email:'',
-                //批量删除选中id
-                selectionList:[],
-                pageSize: 10,
-                total: 0,
-                tableData: [],
-                currentPage: 1,
-                center:true,
-                userFormVisible: false,
-                form: {
+            created() {
+                const this1 = this
+                this1.getList(this1)
+            },
+            data() {
+                return {
+                    baseUrl: this.$root.URL + 'user/users/',
+                    input: '',
                     username: '',
-                    email:''
-                },
-                formLabelWidth: '100px',
-                addForm: {
-                    username: '',
-                    email:''
-                },
+                    email: '',
+                    //批量删除选中id
+                    selectionList: [],
+                    pageSize: 10,
+                    total: 0,
+                    tableData: [],
+                    currentPage: 1,
+                    center: true,
+                    userFormVisible: false,
+                    form: {
+                        username: '',
+                        email: ''
+                    },
+                    formLabelWidth: '100px',
+                    addForm: {
+                        username: '',
+                        email: ''
+                    },
+                }
             }
         }
     }

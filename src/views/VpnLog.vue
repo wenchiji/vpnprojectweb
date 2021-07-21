@@ -196,8 +196,7 @@
         data() {
             return {
                 select:'',
-                baseUrl: 'http://127.0.0.1:8000/vpnlog/getvpnlog/',
-                // baseUrl: 'http://14.18.205.249:9002/vpnlog/getvpnlog/',
+                baseUrl: this.$root.URL+'vpnlog/getvpnlog/',
                 input:'',
                 userId:'',
                 vpnType:'',

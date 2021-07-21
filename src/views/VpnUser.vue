@@ -112,8 +112,16 @@
                     <el-input v-model="editForm.type"></el-input>
                 </el-form-item>
                 <el-form-item style="width: 80%" label="有效截止日期" prop="endTime" >
-                    <el-input v-model="editForm.end_time" ></el-input>
+<!--                    <el-input v-model="editForm.end_time" ></el-input>-->
+                    <el-date-picker
+                        v-model="editForm.end_time"
+                        type="datetime"
+                        format="yyyy-MM-dd HH:mm:ss"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        placeholder="有效截止日期">
+                    </el-date-picker>
                 </el-form-item>
+
                 <el-form-item style="width: 80%" label="流水号" prop="runId" >
                     <el-input v-model="editForm.run_id" ></el-input>
                 </el-form-item>
@@ -191,21 +199,12 @@
                     endTime:this.editForm.end_time,
                     runId:this.editForm.run_id
                 }).then( response => {
-                    if(response.data.success == 'true'){
-                        this.$alert('添加成功!','提示', {
-                            confirmButtonText: '确定',
-                            callback:action=>{
-                                location.reload();
-                            }
-                        });
-                    }else {
-                        this.$alert('添加失败!','提示', {
-                            confirmButtonText: '确定',
-                            callback:action=>{
-                                location.reload();
-                            }
-                        });
-                    }
+                    this.$alert(response.data.msg,'提示', {
+                        confirmButtonText: '确定',
+                        callback:action=>{
+                            this.reload();
+                        }
+                    });
                 })
             },
             updateVpnUser(){
@@ -219,21 +218,12 @@
                     endTime:this.editForm.end_time,
                     runId:this.editForm.run_id
                 }).then( response => {
-                    if(response.data.success == 'true'){
-                        this.$alert('更新成功!','提示', {
-                            confirmButtonText: '确定',
-                            callback:action=>{
-                                location.reload();
-                            }
-                        });
-                    }else {
-                        this.$alert('更新失败!','提示', {
-                            confirmButtonText: '确定',
-                            callback:action=>{
-                                location.reload();
-                            }
-                        });
-                    }
+                    this.$alert(response.data.msg,'提示', {
+                        confirmButtonText: '确定',
+                        callback: action => {
+                            this.reload();
+                        }
+                    });
                 })
             },
             deleteVpnUser(row){
@@ -246,21 +236,12 @@
                         action:'deleteVpnUser',
                         id:row.id
                     }).then((response)=>{
-                        if(response.data.success == "true"){
-                            this.$alert('删除成功!','提示', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    this.reload();
-                                }
-                            });
-                        }else {
-                            this.$alert('删除失败!','提示', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    this.reload();
-                                }
-                            });
-                        }
+                        this.$alert(response.data.msg,'提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                                this.reload();
+                            }
+                        });
                     })
                 }).catch((e) => {
                     console.log(e.message);
@@ -281,21 +262,12 @@
                     action: 'bathDelete',
                     ids: ids
                   }).then((response) => {
-                    if (response.data.success == 'true') {
-                      this.$alert('删除成功!', '提示', {
+                      this.$alert(response.data.msg, '提示', {
                         confirmButtonText: '确定',
                         callback: action => {
                           this.reload();
                         }
                       });
-                    } else {
-                      this.$alert('删除失败!', '提示', {
-                        confirmButtonText: '确定',
-                        callback: action => {
-                          this.reload();
-                        }
-                      });
-                    }
                   }).catch(() => {
                     this.$message({
                       type: 'info',
@@ -305,31 +277,31 @@
               })
             },
             outExe() {
-                this.$axios.post('http://127.0.0.1:8000/vpnproject/exceldata/',{
-                        action:'exportRole',
-                    }).then((response)=>{
-                        if(response.data.success == "true"){
-                            this.$alert('导出成功!','提示', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    this.reload();
-                                }
-                            });
-                        }else {
-                            this.$alert('导出失败!','提示', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    this.reload();
-                                }
-                            });
-                        }
+                this.$confirm('数据正在导出，请耐心等待', '提示', {
+                  confirmButtonText: '确定',
+                  type: 'info'
+                })
+                this.$axios.post(this.$root.URL+'vpnproject/exportRole/', {}, {responseType: 'blob'})
+                    .then(response => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                        const link = document.createElement('a')
+                        link.href = encodeURI(url);
+                        link.setAttribute('download', 'user_roles.csv')
+                        document.body.appendChild(link)
+                        link.click()
+                        document.body.removeChild(link)
+                        window.URL.revokeObjectURL(url)
+                        this.$message({
+                          type: 'success',
+                          message: '导出成功！'
+                        });
                     })
             },
             uploadCsv(){
                 if(Object.keys(this.file).length != 0){
                     let data = new FormData()
                     data.append('file', this.file)
-                    this.$axios.post('http://127.0.0.1:8000/vpnproject/uploadRole/', data).then(response =>{
+                    this.$axios.post(this.$root.URL+'vpnproject/uploadRole/', data).then(response =>{
                         if(response.data.success == "true"){
                             this.csvVisible = false;
                             this.$alert('导入成功：'+response.data.success_num+'个，导入失败: ' + response.data.error_num+'个: '+response.data.msg, '提示', {
@@ -379,7 +351,7 @@
                 csvVisible:false,
                 csvTitle:'',
                 select:'',
-                baseUrl: 'http://127.0.0.1:8000/vpnproject/vpnuser/',
+                baseUrl: this.$root.URL+'vpnproject/vpnuser/',
                 selectionList:'',
                 input:'',
                 vpnName:'',

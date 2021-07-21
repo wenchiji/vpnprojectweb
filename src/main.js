@@ -18,9 +18,14 @@ axios.defaults.withCredentials = true; // 允许携带cookie
 
 // 挂载
 new Vue({
-  router,
-  store:store,
-  render: h => h(App)
+    router,
+    store:store,
+    data:function () {
+        return{
+            URL:'http://127.0.0.1:8000/'
+        }
+    },
+    render: h => h(App),
 }).$mount('#app')
 
 axios.interceptors.request.use(

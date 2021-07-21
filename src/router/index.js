@@ -7,6 +7,7 @@ import VpnType from "@/views/VpnType";
 import VpnUser from "@/views/VpnUser"
 import Login from "@/views/Login";
 import Manager from "@/views/Manager";
+import LineStatusLog from "@/views/LineStatusLog";
 
 Vue.use(VueRouter)
 
@@ -53,6 +54,11 @@ const routes = [
         path: '/listVpnLog',
         name: 'VpnLog',
         component: VpnLog
+      },
+        {
+        path: '/lineStatusLog',
+        name: 'lineStatusLog',
+        component: LineStatusLog
       },
     ]
   },
